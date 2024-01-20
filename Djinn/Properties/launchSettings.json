@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Djinn": {
+      "commandName": "Project",
+      "commandLineArgs": "download --artist-name=\"polyphia\" --file-types=\".flac\""
+    }
+  }
+}
