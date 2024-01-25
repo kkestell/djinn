@@ -1,36 +1,37 @@
 ﻿namespace Djinn.Metadata;
 
-public abstract class AudioFile
+public abstract class AudioFile(Stream stream)
 {
-    protected readonly Dictionary<string, object> _fields = [];
+    protected readonly Stream AudioStream = stream;
+    protected readonly Dictionary<string, object> Fields = [];
 
     public object? Get(Field field)
     {
-        return _fields.TryGetValue(field.ToString(), out var value) ? value : null;
+        return Fields.TryGetValue(field.ToString(), out var value) ? value : null;
     }
 
     public void Set(Field field, object? value)
     {
         if (value is null)
         {
-            _fields.Remove(field.ToString());
+            Fields.Remove(field.ToString());
         }
-        else if (_fields.ContainsKey(field.ToString()))
+        else if (Fields.ContainsKey(field.ToString()))
         {
-            _fields[field.ToString()] = value;
+            Fields[field.ToString()] = value;
         }
         else
         {
-            _fields.Add(field.ToString(), value);
+            Fields.Add(field.ToString(), value);
         }
     }
 
     public void Clear()
     {
-        _fields.Clear();
+        Fields.Clear();
     }
-
+    
     public abstract void Load();
 
-    public abstract void Save();
+    public abstract Stream Save();
 }

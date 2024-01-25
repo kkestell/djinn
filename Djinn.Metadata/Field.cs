@@ -14,6 +14,7 @@ public class Field
     public static Field Album => new("ALBUM");
     public static Field Artist => new("ARTIST");
     public static Field Date => new("DATE");
+    public static Field Year => new("YEAR");
     public static Field TrackNumber => new("TRACKNUMBER");
     public static Field TotalTracks => new("TOTALTRACKS");
     public static Field DiscNumber => new("DISCNUMBER");

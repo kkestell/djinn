@@ -21,4 +21,11 @@
     <ProjectReference Include="..\Djinn.Metadata\Djinn.Metadata.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="TestData\test.flac" />
+    <EmbeddedResource Include="TestData\test.flac" />
+    <None Remove="TestData\test.mp3" />
+    <EmbeddedResource Include="TestData\test.mp3" />
+  </ItemGroup>
+
 </Project>
