@@ -19,7 +19,8 @@ internal abstract class Program
             new ConfigCommand(),
             new CoverCommand(),
             new UpgradeCommand(),
-            new SuggestCommand()
+            new SuggestCommand(),
+            new StatsCommand()
         };
 
         var commandLine = new CommandLineBuilder(rootCommand)
