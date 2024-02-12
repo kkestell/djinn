@@ -30,25 +30,43 @@ Options:
 
 ### Downloading a Single Release
 
-To download a specific release from MusicBrainz, use the `download` command with the `--release` option.
+To download a specific release from MusicBrainz, use the `download` command with the `--release-id` option.
 
 ```
-djinn download --release "fb70321f-78df-30ff-92de-21a4bc9ca16c"
+djinn download --release-id "fb70321f-78df-30ff-92de-21a4bc9ca16c"
 ```
 
-If the release contains more than one artist credit, you must specify the artist ID as well.
+Or the `--release-title` option.
 
 ```
-djinn download --release "fb70321f-78df-30ff-92de-21a4bc9ca16c" --artist "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d"
+djinn download --release-title "Abbey Road"
+```
+
+If the release contains more than one artist credit, you must specify the artist as well. Use the `--artist-id` option.
+
+```
+djinn download --release-title "Abbey Road" --artist-id "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d"
+```
+
+Or the `--artist-name` option.
+
+```
+djinn download --release-title "Abbey Road" --artist-name "The Beatles"
 ```
 
 ### Downloading an Artist's Discography
 
-To download the complete discography of an artist use the `download` command with the `--artist` option. 
+To download the complete discography of an artist use the `download` command with the `--artist-id` option. 
 
 
 ```
-djinn download --artist "78307112-b93f-451b-9da8-09cdb2c64d14"
+djinn download --artist-id "78307112-b93f-451b-9da8-09cdb2c64d14"
+```
+
+Or the `--artist-name` option.
+
+```
+djinn download --artist-name "The Beatles"
 ```
 
 ## Music Library Organization
@@ -138,6 +156,17 @@ Soulseek password:  XXX
 ```
 
 This command provides a quick way to ensure that Djinn is configured correctly and is reading from the intended configuration file.
+
+### Display Library Statistics with `djinn stats`
+
+You can view statistics about your music library by running:
+
+```console
+$ djinn stats
+Artists: 427
+Albums:  2013
+Tracks:  22761
+```
 
 ## Building
 
