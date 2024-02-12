@@ -5,7 +5,12 @@ namespace Djinn.Commands.Handlers;
 
 public class StatsCommandHandler : ICommandHandler
 {
-    public async Task<int> InvokeAsync(InvocationContext context)
+    public Task<int> InvokeAsync(InvocationContext context)
+    {
+        return Task.FromResult(Invoke(context));
+    }
+
+    public int Invoke(InvocationContext context)
     {
         var config = DjinnConfig.Load();
         
@@ -38,10 +43,5 @@ public class StatsCommandHandler : ICommandHandler
         Console.CursorVisible = true;
         
         return 0;
-    }
-
-    public int Invoke(InvocationContext context)
-    {
-        throw new NotImplementedException();
     }
 }
