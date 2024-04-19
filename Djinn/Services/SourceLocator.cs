@@ -24,9 +24,9 @@ public class SourceLocator
         return sources;
     }
 
-    private async Task<List<SearchResponse>> Search(Album album, CancellationToken stoppingToken)
+    private async Task<List<SearchResponse>> DoSearch(string query, CancellationToken stoppingToken)
     {
-        var searchQuery = new SearchQuery($"{album.Artist.Name} {album.Title}");
+        var searchQuery = new SearchQuery(query);
         var searchOptions = new SearchOptions(
             fileFilter: file =>
                 _fileExtensions.Contains(Path.GetExtension(PathUtils.SoulseekFilename(file)).ToLowerInvariant())
@@ -40,8 +40,26 @@ public class SourceLocator
             .OrderByDescending(x => x.HasFreeUploadSlot)
             .ThenByDescending(x => x.UploadSpeed)
             .ToList();
-        Log.Verbose($"Received {responses.Count} responses for {album}");
+        Log.Verbose($"Received {responses.Count} responses for {query}");
         return responses;
+    }
+    
+    private async Task<List<SearchResponse>> Search(Album album, CancellationToken stoppingToken)
+    {
+        var query = $"{album.Artist.Name} {album.Title}";
+        var responses = await DoSearch(query, stoppingToken);
+        if (responses.Count > 0)
+            return responses;
+        Log.Verbose($"No results found for {query}");
+        if (album.Title.Contains(':') || album.Title.Contains('-'))
+        {
+            query = $"{album.Artist.Name} {album.Title.Split(':', '-').First()}";
+            responses = await DoSearch(query, stoppingToken);
+            if (responses.Count > 0)
+                return responses;
+            Log.Verbose($"No results found for {query}");
+        }
+        return [];
     }
 
     private List<DownloadSource> BuildSourceList(List<SearchResponse> responses, Album album)
@@ -59,7 +77,6 @@ public class SourceLocator
             Log.Verbose($"Found {tracks.Count} matches for {response.Username}");
             sources.Add(new DownloadSource(response.Username, tracks));
         }
-
         return sources;
     }
 
@@ -99,15 +116,9 @@ public class SourceLocator
         return matches;
     }
 
-    public class DownloadSource
+    public class DownloadSource(string username, Dictionary<Track, File> files)
     {
-        public DownloadSource(string username, Dictionary<Track, File> files)
-        {
-            Username = username;
-            Files = files;
-        }
-
-        public string Username { get; }
-        public Dictionary<Track, File> Files { get; }
+        public string Username { get; } = username;
+        public Dictionary<Track, File> Files { get; } = files;
     }
 }
