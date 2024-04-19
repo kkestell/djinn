@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using Djinn.Configuration;
 using Djinn.Models;
 using IF.Lastfm.Core.Api;
@@ -10,6 +9,9 @@ public class CoverArtDownloader
 {
     private const string Contact = "https://github.com/kkestell/djinn";
     private const string Product = "Djinn";
+    private const int VersionMajor = 1;
+    private const int VersionMinor = 0;
+    private const int VersionPatch = 0;
 
     private readonly DjinnConfig _config;
 
@@ -33,8 +35,8 @@ public class CoverArtDownloader
         try
         {
             Log.Verbose($"Downloading cover art from MusicBrainz for {album.Artist.Name} - {album.Title}");
-            
-            var client = new CoverArt(new ProductHeaderValue(Product), new Uri(Contact));
+
+            var client = new CoverArt(Product, new Version(VersionMajor, VersionMinor, VersionPatch), new Uri(Contact));
             var response = await client.FetchReleaseAsync(album.Id);
 
             var coverUrl = response.Images.FirstOrDefault(x => x.Front)?.Location;
