@@ -6,7 +6,7 @@ Djinn is a command-line application for downloading music using Soulseek, with m
 
 ## Downloading Music with `djinn download`
 
-```console
+```
 $ djinn download --help
 Description:
   Download one or more releases
@@ -145,7 +145,7 @@ All artist and album tokens, plus:
 
 You can view the path of the loaded config file and the parsed values by running:
 
-```console
+```
 $ djinn config
 Configuration loaded from /home/kyle/.config/djinn/djinn.json
 Library path:       /home/kyle/Music
@@ -161,7 +161,7 @@ This command provides a quick way to ensure that Djinn is configured correctly a
 
 You can view statistics about your music library by running:
 
-```console
+```
 $ djinn stats
 Artists: 427
 Albums:  2013
@@ -179,6 +179,6 @@ sudo pacman -Sy flac
 
 ### Fedora
 
-```console
+```
 sudo dnf install python3-eyed3 flac
 ```
