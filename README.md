@@ -163,9 +163,7 @@ You can view statistics about your music library by running:
 
 ```
 $ djinn stats
-Artists: 427
-Albums:  2013
-Tracks:  22761
+Artists: 427, Albums: 2013, Tracks: 22761
 ```
 
 ## Building
@@ -182,3 +180,10 @@ sudo pacman -Sy flac
 ```
 sudo dnf install python3-eyed3 flac
 ```
+
+### Ubuntu 24.04
+
+```
+sudo apt install eyed3 flac
+```
+

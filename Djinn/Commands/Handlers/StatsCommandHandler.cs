@@ -18,13 +18,11 @@ public class StatsCommandHandler : ICommandHandler
         var artistDirectories = libraryDirectory.EnumerateDirectories().ToList();
         var numArtists = artistDirectories.Count;
 
-        Console.WriteLine($"Artists: {numArtists}");
 
         var numAlbums = 0;
         var numTracks = 0;
         
         Console.CursorVisible = false;
-        var currentRow = Console.CursorTop;
 
         foreach (var artistDirectory in artistDirectories)
         {
@@ -35,10 +33,11 @@ public class StatsCommandHandler : ICommandHandler
                 numTracks += albumDirectory.EnumerateFiles().Count(file => file.Extension.Equals(".mp3", StringComparison.OrdinalIgnoreCase) || file.Extension.Equals(".flac", StringComparison.OrdinalIgnoreCase));
             }
 
-            Console.SetCursorPosition(0, currentRow);
-            Console.WriteLine($"Albums:  {numAlbums}");
-            Console.WriteLine($"Tracks:  {numTracks}");
+            Console.CursorLeft = 0;
+            Console.Write($"Artists: {numArtists}, Albums: {numAlbums}, Tracks: {numTracks}");
         }
+
+        Console.WriteLine();
 
         Console.CursorVisible = true;
         
