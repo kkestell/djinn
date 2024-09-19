@@ -2,7 +2,7 @@
 
 ## Overview
 
-Djinn is a command-line application for downloading music using Soulseek, with metadata from MusicBrainz and Last.fm.
+Djinn is a command-line application for downloading music using Soulseek, with metadata from MusicBrainz, Last.fm, and Spotify.
 
 ## Downloading Music with `djinn download`
 
@@ -58,7 +58,6 @@ djinn download --release-title "Abbey Road" --artist-name "The Beatles"
 
 To download the complete discography of an artist use the `download` command with the `--artist-id` option. 
 
-
 ```
 djinn download --artist-id "78307112-b93f-451b-9da8-09cdb2c64d14"
 ```
@@ -71,7 +70,7 @@ djinn download --artist-name "The Beatles"
 
 ## Music Library Organization
 
-Djinn assumes that your your music library follows a simple Artist/Album/Track structure.
+Djinn assumes that your music library follows a simple Artist/Album/Track structure.
 
 You must set the `ArtistFormat`, `AlbumFormat`, and `TrackFormat` strings in your configuration file to correspond with the way you organize your music.
 
@@ -102,6 +101,8 @@ Here is an example of what the configuration file might look like:
     "LibraryPath": "/home/kyle/Music",
     "LastFmApiKey": "XXX",
     "LastFmApiSecret": "XXX",
+    "SpotifyClientId": "XXX",
+    "SpotifyClientSecret": "XXX",
     "SoulseekUsername": "XXX",
     "SoulseekPassword": "XXX",
     "ArtistFormat": "%S",
@@ -151,6 +152,8 @@ Configuration loaded from /home/kyle/.config/djinn/djinn.json
 Library path:       /home/kyle/Music
 Last.fm API key:    XXX
 Last.fm API secret: XXX
+Spotify client ID:  XXX
+Spotify secret:     XXX
 Soulseek username:  XXX
 Soulseek password:  XXX
 ```
@@ -164,6 +167,21 @@ You can view statistics about your music library by running:
 ```
 $ djinn stats
 Artists: 427, Albums: 2013, Tracks: 22761
+```
+
+### Download Missing Cover Art with `djinn covers`
+
+```
+$ djinn covers
+Downloaded cover art for Velvet Teen, The - Elysium
+Downloaded cover art for Yo‐Yo Ma - Japanese Melodies
+```
+
+### Replace MP3 Files with FLAC Files with `djinn upgrade`
+
+```
+$ djinn upgrade
+...
 ```
 
 ## Building

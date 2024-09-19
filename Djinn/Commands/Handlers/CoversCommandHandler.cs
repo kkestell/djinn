@@ -12,30 +12,35 @@ public class CoversCommandHandler : ICommandHandler
     public async Task<int> InvokeAsync(InvocationContext context)
     {
         var config = DjinnConfig.Load();
+        
         var verbose = context.ParseResult.GetValueForOption(CoverCommand.Verbose);
         var force = context.ParseResult.GetValueForOption(CoverCommand.Force);
+        
         if (verbose)
-            Log.Level = LogLevel.Verbose;
+            Log.Level = LogLevel.Debug;
+        
         var musicBrainzService = new MusicBrainzService();
         var coverArtDownloader = new CoverArtDownloader(config);
+        
         foreach (var scanResult in GetReleaseIds(new DirectoryInfo(config.LibraryPath), force))
         {
+            var album = await musicBrainzService.FindAlbum(scanResult.ReleaseId, scanResult.ArtistName);
+
             try
             {
-                var album = await musicBrainzService.FindAlbum(scanResult.ReleaseId, scanResult.ArtistName);
                 var cover = await coverArtDownloader.DownloadCoverArt(album, scanResult.AlbumDirectory);
 
                 if (cover is null)
                 {
-                    Log.Error($"Unable to download cover art for {scanResult.ArtistName} - {scanResult.ReleaseId}");
+                    Log.Error($"No cover art found for {scanResult.ArtistName} - {album.Title}");
                     continue;
                 }
                 
-                Log.Information($"Downloaded {cover.FullName}");
+                Log.Information($"Downloaded cover art for {scanResult.ArtistName} - {album.Title}");
             }
             catch(Exception e)
             {
-                Log.Error(e, $"Error downloading cover art for {scanResult.ArtistName} - {scanResult.ReleaseId}");
+                Log.Error(e, $"Error downloading cover art for {scanResult.ArtistName} - {album.Title}");
             }
         }
 

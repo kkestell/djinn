@@ -42,7 +42,7 @@ public class AlbumDownloader
         {
             await soulseekClient.ConnectAsync(_config.SoulseekUsername, _config.SoulseekPassword);
 
-            Log.Information($"Searching for {album}...");
+            Log.Information($"Searching for {album}…");
 
             var sourceLocator = new SourceLocator(soulseekClient, fileTypes);
             var downloadSources = await sourceLocator.LocateSources(album);
@@ -53,7 +53,7 @@ public class AlbumDownloader
                 return false;
             }
 
-            Log.Information($"Downloading {album} from {downloadSources.Count} sources...");
+            Log.Information($"Downloading {album} from {downloadSources.Count} sources…");
 
             downloadResult = await _sourceDownloader.DownloadFiles(soulseekClient, album, downloadSources);
         }

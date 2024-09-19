@@ -17,6 +17,8 @@ public class ConfigCommandHandler : ICommandHandler
         Log.Information($"Library path:       {config.LibraryPath}");
         Log.Information($"Last.fm API key:    {config.LastFmApiKey}");
         Log.Information($"Last.fm API secret: {config.LastFmApiSecret}");
+        Log.Information($"Spotify client ID:  {config.SpotifyClientId}");
+        Log.Information($"Spotify secret:     {config.SpotifyClientSecret}");
         Log.Information($"Soulseek username:  {config.SoulseekUsername}");
         Log.Information($"Soulseek password:  {config.SoulseekPassword}");
         Log.Information($"Artist format:      {config.ArtistFormat}");

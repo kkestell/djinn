@@ -2,7 +2,7 @@
   "profiles": {
     "Djinn": {
       "commandName": "Project",
-      "commandLineArgs": "stats"
+      "commandLineArgs": "download --artist-name=\"The Cure\""
     }
   }
 }

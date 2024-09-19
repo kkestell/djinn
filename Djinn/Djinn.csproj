@@ -19,7 +19,8 @@
         <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
         <PackageReference Include="MetaBrainz.MusicBrainz" Version="6.1.0" />
         <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="6.0.0" />
-        <PackageReference Include="Soulseek" Version="6.4.1" />
+        <PackageReference Include="Soulseek" Version="6.5.0" />
+        <PackageReference Include="SpotifyAPI.Web" Version="7.1.1" />
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
         <PackageReference Include="TagLibSharp" Version="2.3.0" />
     </ItemGroup>

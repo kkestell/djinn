@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Djinn.Configuration;
 using Djinn.Models;
 using Djinn.Utils;
@@ -15,6 +16,7 @@ public class SourceDownloader
     private readonly TransferOptions _transferOptions;
     private CancellationTokenSource _transferStoppingTokenSource = new();
     private Stopwatch _transferStopWatch = new();
+    private CancellationTokenSource _globalCancellationSource = new();
 
     public SourceDownloader(DjinnConfig config)
     {
@@ -32,36 +34,48 @@ public class SourceDownloader
         IReadOnlyList<SourceLocator.DownloadSource> downloadSources)
     {
         var idx = 1;
-        // var cancelled = false;
-        
+
         foreach (var source in downloadSources)
         {
-            // if (cancelled)
-            //     break;
-            
-            Log.Information($"Downloading from {source.Username} ({idx++}/{downloadSources.Count})...");
-            
+            if (_globalCancellationSource.Token.IsCancellationRequested)
+            {
+                Log.Information("SourceDownloader: Global cancellation requested, stopping downloads.");
+                break;
+            }
+
+            Log.Information($"Downloading from {source.Username} ({idx++}/{downloadSources.Count})…");
+
             var tempDirectory = CreateTempDirectory();
-            
-            var cts = new CancellationTokenSource();
+
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(_globalCancellationSource.Token);
             Log.Debug("SourceDownloader: Initialized CancellationTokenSource");
-            
+
             if (_config.Watchdog?.TimeoutMinutes != null)
                 cts.CancelAfter(TimeSpan.FromMinutes(_config.Watchdog.TimeoutMinutes.Value));
-            
+
+            // Register SIGQUIT handler for Unix-like systems to cancel all transfers
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                PosixSignalRegistration.Create(PosixSignal.SIGQUIT, sig =>
+                {
+                    Log.Information("SourceDownloader: Received SIGQUIT, cancelling all transfers.");
+                    _globalCancellationSource.Cancel();
+                });
+            }
+
             try
             {
                 Console.CancelKeyPress += CancelSourceHandler;
                 Log.Debug("SourceDownloader: Registered CancelKeyPress handler");
-                
+
                 var downloadedFiles =
                     await DownloadFilesFromSource(soulseekClient, album, source, tempDirectory, cts.Token);
-                
+
                 if (downloadedFiles is not null)
                     return new DownloadResult(tempDirectory, downloadedFiles);
-                
+
                 Log.Verbose($"Download from {source.Username} failed");
-                
+
                 tempDirectory.Delete(true);
                 Log.Verbose($"Deleted temporary directory {tempDirectory.FullName}");
             }
@@ -69,7 +83,7 @@ public class SourceDownloader
             {
                 if (_config.Verbose)
                     Log.Error(e, $"Error downloading from {source.Username}");
-                
+
                 tempDirectory.Delete(true);
                 Log.Verbose($"Deleted temporary directory {tempDirectory.FullName}");
             }
@@ -86,11 +100,6 @@ public class SourceDownloader
                 e.Cancel = true;
                 cts.Cancel();
                 Log.Debug("SourceDownloader: Called cts.Cancel()");
-                
-                // Console.WriteLine("Try next source? [Y/n]");
-                // var key = Console.ReadKey();
-                // if (key.Key == ConsoleKey.N)
-                //     cancelled = true;
             }
         }
 
@@ -101,10 +110,16 @@ public class SourceDownloader
         Album album, SourceLocator.DownloadSource downloadSource, FileSystemInfo tempDirectory,
         CancellationToken stoppingToken)
     {
-        Log.Verbose($"Downloading {downloadSource.Files.Count} files from {downloadSource.Username}...");
+        Log.Verbose($"Downloading {downloadSource.Files.Count} files from {downloadSource.Username}…");
         var downloadedFiles = new Dictionary<Track, FileInfo>();
         foreach (var (track, file) in downloadSource.Files)
         {
+            if (stoppingToken.IsCancellationRequested)
+            {
+                Log.Verbose("SourceDownloader: Transfer cancelled before it began.");
+                return null;
+            }
+
             _transferStoppingTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             _transferStopWatch = new Stopwatch();
             _transferStopWatch.Start();
@@ -241,9 +256,15 @@ public class SourceDownloader
         return "Unknown";
     }
 
-    public class DownloadResult(DirectoryInfo tempDirectory, Dictionary<Track, FileInfo> files)
+    public class DownloadResult
     {
-        public DirectoryInfo TempDirectory { get; } = tempDirectory;
-        public Dictionary<Track, FileInfo> Files { get; } = files;
+        public DirectoryInfo TempDirectory { get; }
+        public Dictionary<Track, FileInfo> Files { get; }
+
+        public DownloadResult(DirectoryInfo tempDirectory, Dictionary<Track, FileInfo> files)
+        {
+            TempDirectory = tempDirectory;
+            Files = files;
+        }
     }
 }

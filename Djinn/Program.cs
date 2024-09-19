@@ -4,6 +4,8 @@ using System.CommandLine.Parsing;
 using System.Text;
 
 using Djinn.Commands;
+using Djinn.Configuration;
+using Djinn.Services;
 
 namespace Djinn;
 
@@ -12,6 +14,16 @@ internal abstract class Program
     private static async Task<int> Main(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
+
+        try
+        {
+            DjinnConfig.Validate();
+        }
+        catch (ConfigurationError e)
+        {
+            Log.Error(e.Message);
+            return 1;
+        }
 
         var rootCommand = new RootCommand
         {

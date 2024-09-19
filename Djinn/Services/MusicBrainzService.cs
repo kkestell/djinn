@@ -33,17 +33,30 @@ internal class MusicBrainzService
         }
         else
         {
+            var longestName = artists.Results.Max(x => x.Item.Name?.Length)!.Value;
+            var longestDisambiguation = artists.Results.Max(x => x.Item.Disambiguation?.Length)!.Value;
+            
+            if (longestName > 39)
+                longestName = 39;
+            
+            if (longestDisambiguation > 40)
+                longestDisambiguation = 40;
+            
             var selectList = new SelectList(artists.Results.Select(x =>
             {
                 var sb = new FixedWidthStringBuilder();
 
                 var name = x.Item.Name!;
-                sb.Append(name, 50);
+                if (name.Length > longestName)
+                    name = name.Substring(0, longestName - 1) + "…";
+                sb.Append(name, longestName + 1);
 
                 var disambiguation = x.Item.Disambiguation;
                 if (!string.IsNullOrEmpty(disambiguation))
                 {
-                    sb.Append(disambiguation, 30);
+                    if (disambiguation.Length > longestDisambiguation)
+                        disambiguation = disambiguation.Substring(0, longestDisambiguation - 1) + "…";
+                    sb.Append(disambiguation, longestDisambiguation);
                 }
 
                 return sb.ToString();
@@ -58,7 +71,7 @@ internal class MusicBrainzService
     
     public async Task<List<Album>> LocateAlbums(Guid artistId)
     {
-        Log.Verbose($"Locating albums by artist id: {artistId}...");
+        Log.Verbose($"Locating albums by artist id: {artistId}…");
         
         var mbArtist = await _query.LookupArtistAsync(artistId, Include.ReleaseGroups | Include.Releases);
         var artist = Artist.Create(mbArtist);
@@ -86,13 +99,15 @@ internal class MusicBrainzService
             
             Log.Verbose($"Found suitable release {release.Title} {release.Country} {release.ReleaseGroup?.FirstReleaseDate?.Year} {release.Media?.FirstOrDefault()?.Format}");
         }
+        
+        albums.Sort((x, y) => x.Date.CompareTo(y.Date));
 
         return albums;
     }
     
     private IRelease? GetBestRelease(IReadOnlyList<IRelease> releases)
     {
-        Log.Verbose($"Evaluating release group {releases.First().Title}...");
+        Log.Verbose($"Evaluating release group {releases.First().Title}…");
             
         var release = releases.FirstOrDefault(x =>
         {
@@ -189,12 +204,12 @@ internal class MusicBrainzService
                 var sb = new FixedWidthStringBuilder();
 
                 var name = x.Name!;
-                sb.Append(name, 30);
+                sb.Append(name, 40);
 
                 var disambiguation = x.Artist?.Disambiguation;
                 if (!string.IsNullOrEmpty(disambiguation))
                 {
-                    sb.Append(disambiguation, 20);
+                    sb.Append(disambiguation, 40);
                 }
 
                 return sb.ToString();

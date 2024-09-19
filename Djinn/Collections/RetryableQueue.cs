@@ -36,7 +36,7 @@ internal class RetryableQueue<T>(TimeSpan? waitBeforeRetrying = null)
     {
         if (_mainQueue.Count == 0 && _retryQueue.Count > 0)
         {
-            Log.Verbose($"Waiting {_waitBeforeRetrying} before retrying...");
+            Log.Verbose($"Waiting {_waitBeforeRetrying} before retrying…");
             Thread.Sleep(_waitBeforeRetrying);
             
             _mainQueue = new Queue<T>(_retryQueue);

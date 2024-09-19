@@ -2,6 +2,7 @@ using Djinn.Configuration;
 using Djinn.Models;
 using IF.Lastfm.Core.Api;
 using MetaBrainz.MusicBrainz.CoverArt;
+using SpotifyAPI.Web;
 
 namespace Djinn.Services;
 
@@ -26,6 +27,7 @@ public class CoverArtDownloader
         
         var coverImage = await DownloadFromMusicBrainz(release, downloadDirectory.FullName);
         coverImage ??= await DownloadFromLastFm(release, downloadDirectory.FullName);
+        coverImage ??= await DownloadFromSpotify(release, downloadDirectory.FullName);
 
         return coverImage;
     }
@@ -47,6 +49,10 @@ public class CoverArtDownloader
             var coverImage = await DownloadFile(coverUrl, directory);
             
             return coverImage;
+        }
+        catch (MetaBrainz.Common.HttpError e)
+        {
+            return null;
         }
         catch (Exception e)
         {
@@ -79,18 +85,73 @@ public class CoverArtDownloader
             return null;
         }
     }
+    
+    private async Task<FileInfo?> DownloadFromSpotify(Album album, string directory)
+    {
+        try
+        {
+            Log.Verbose($"Downloading cover art from Spotify for {album.Artist.Name} - {album.Title}");
+
+            var config = SpotifyClientConfig
+                .CreateDefault()
+                .WithAuthenticator(new ClientCredentialsAuthenticator(_config.SpotifyClientId, _config.SpotifyClientSecret));
+
+            var spotify = new SpotifyClient(config);
+
+            var searchRequest = new SearchRequest(SearchRequest.Types.Album, $"{album.Artist.Name} {album.Title}");
+            var searchResponse = await spotify.Search.Item(searchRequest);
+
+            if (searchResponse.Albums.Items is null)
+                return null;
+            
+            if (searchResponse.Albums.Items.Count == 0)
+                return null;
+
+            var spotifyAlbum = searchResponse.Albums.Items.First();
+            var coverUrl = spotifyAlbum.Images.OrderByDescending(i => i.Height).First().Url;
+
+            if (string.IsNullOrEmpty(coverUrl))
+                return null;
+
+            var coverImage = await DownloadFile(new Uri(coverUrl), directory);
+            
+            return coverImage;
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, $"Error downloading cover art from Spotify for {album.Artist.Name} - {album.Title}");
+            return null;
+        }
+    }
 
     private static async Task<FileInfo?> DownloadFile(Uri uri, string directory)
     {
         using var httpClient = new HttpClient();
 
-        var bytes = await httpClient.GetByteArrayAsync(uri);
-        var fileExtension = Path.GetExtension(uri.AbsolutePath);
+        using var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, uri));
+        response.EnsureSuccessStatusCode();
+
+        var contentType = response.Content.Headers.ContentType?.MediaType;
+        var fileExtension = GetFileExtensionFromContentType(contentType);
+
         var fileName = $"cover{fileExtension}";
         var filePath = Path.Combine(directory, fileName);
 
+        var bytes = await httpClient.GetByteArrayAsync(uri);
         await File.WriteAllBytesAsync(filePath, bytes);
 
         return new FileInfo(filePath);
+    }
+
+    private static string GetFileExtensionFromContentType(string? contentType)
+    {
+        return contentType?.ToLower() switch
+        {
+            "image/jpeg" => ".jpg",
+            "image/png" => ".png",
+            "image/gif" => ".gif",
+            "image/webp" => ".webp",
+            _ => ".jpg"  // Default to .jpg if content type is unknown
+        };
     }
 }

@@ -25,7 +25,7 @@ public class FixedWidthStringBuilder
         }
         else if (value.Length > finalWidth)
         {
-            value = value[..(finalWidth - 3)] + "...";
+            value = value[..(finalWidth - 1)] + "…";
         }
 
         var formattedValue = align switch
@@ -37,8 +37,7 @@ public class FixedWidthStringBuilder
 
         _stringBuilder.Append(formattedValue);
     }
-
-
+    
     public override string ToString()
     {
         return _stringBuilder.ToString();

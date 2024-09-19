@@ -67,7 +67,7 @@ public class SourceLocator
         var sources = new List<DownloadSource>();
         foreach (var response in responses)
         {
-            Log.Verbose($"Matching tracks to files from {response.Username}...");
+            Log.Verbose($"Matching tracks to files from {response.Username}…");
             var tracks = MatchTracksToFiles(album.Tracks, response.Files.ToList());
             if (tracks is null)
             {
