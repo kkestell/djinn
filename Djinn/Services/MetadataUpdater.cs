@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Djinn.Configuration;
-using Djinn.Metadata;
 using Djinn.Models;
 
 namespace Djinn.Services;
