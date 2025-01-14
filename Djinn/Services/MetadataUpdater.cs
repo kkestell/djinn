@@ -4,39 +4,6 @@ using Djinn.Models;
 
 namespace Djinn.Services;
 
-// public class MetadataUpdater
-// {
-//     private readonly DjinnConfig _config;
-//
-//     public MetadataUpdater(DjinnConfig config)
-//     {
-//         _config = config;
-//     }
-//
-//     public void Update(Album album, Dictionary<Track, FileInfo> trackFiles, FileInfo? coverImageFile)
-//     {
-//         foreach (var (track, file) in trackFiles)
-//         {
-//             var audioFile = AudioFileLoader.Load(file.FullName);
-//
-//             if (_config.StripExistingMetadata)
-//                 audioFile.Clear();
-//
-//             audioFile.Set(Field.Title, track.Title);
-//             audioFile.Set(Field.Album, album.Title);
-//             audioFile.Set(Field.Artist, album.Artist.Name);
-//             audioFile.Set(Field.TrackNumber, track.Number);
-//             audioFile.Set(Field.TotalTracks, album.Tracks.Count);
-//             audioFile.Set(Field.Date, album.Date.Year);
-//             audioFile.Set(Field.MusicbrainzTrackId, track.Id);
-//             audioFile.Set(Field.MusicbrainzReleaseGroupId, album.Id);
-//             audioFile.Set(Field.MusicbrainzArtistId, album.Artist.Id);
-//
-//             audioFile.Save();
-//         }
-//     }
-// }
-
 public class MetadataUpdater
 {
     private readonly DjinnConfig _config;
@@ -53,114 +20,185 @@ public class MetadataUpdater
             if (_config.StripExistingMetadata)
                 StripMetadata(audioFile);
 
-            var tagFile = TagLib.File.Create(audioFile.FullName);
-
-            tagFile.Tag.MusicBrainzReleaseId = album.Id.ToString();
-            tagFile.Tag.MusicBrainzArtistId = album.Artist.Id.ToString();
-            tagFile.Tag.MusicBrainzTrackId = track.Id.ToString();
-            tagFile.Tag.Track = (uint)track.Number;
-            tagFile.Tag.TrackCount = (uint)album.Tracks.Count;
-            tagFile.Tag.Title = track.Title;
-            tagFile.Tag.TitleSort = track.Title;
-            tagFile.Tag.Album = album.Title;
-            tagFile.Tag.AlbumSort = album.Title;
-            tagFile.Tag.AlbumArtists = [album.Artist.Name];
-            tagFile.Tag.AlbumArtistsSort = [album.Artist.SortName];
-            tagFile.Tag.Artists = [album.Artist.Name];
-            tagFile.Tag.Year = (uint)album.Date.Year;
-
-            tagFile.Save();
+            UpdateMetadata(audioFile, track, album);
 
             if (coverImageFile is not null)
                 AddCoverImage(audioFile, coverImageFile);
         }
     }
 
-    private static void AddCoverImage(FileInfo audioFile, FileInfo coverFile)
+    private void RunFfmpegProcess(ProcessStartInfo startInfo, string operation)
     {
-        string filename;
-        string arguments;
+        Log.Verbose($"Running FFmpeg {operation}...");
+        Log.Verbose($"Command: {startInfo.FileName} {startInfo.Arguments}");
 
-        switch (audioFile.Extension)
+        using var process = new Process { StartInfo = startInfo };
+
+        var outputBuilder = new System.Text.StringBuilder();
+        var errorBuilder = new System.Text.StringBuilder();
+
+        process.OutputDataReceived += (sender, args) =>
         {
-            case ".mp3":
-                filename = "eyeD3";
-                arguments = $"--add-image={coverFile.FullName}:FRONT_COVER \"{audioFile.FullName}\"";
-                break;
-            case ".flac":
-                filename = "metaflac";
-                arguments = $"--import-picture-from=\"3||||{coverFile.FullName}\" \"{audioFile.FullName}\"";
-                break;
-            default:
-                throw new ArgumentException($"Unsupported file type: {audioFile.Extension}",nameof(audioFile));
+            if (args.Data != null)
+            {
+                outputBuilder.AppendLine(args.Data);
+                if (_config.Verbose)
+                {
+                    Log.Verbose($"FFmpeg: {args.Data}");
+                }
+            }
+        };
+
+        process.ErrorDataReceived += (sender, args) =>
+        {
+            if (args.Data != null)
+            {
+                errorBuilder.AppendLine(args.Data);
+                if (_config.Verbose)
+                {
+                    Log.Verbose($"FFmpeg Error: {args.Data}");
+                }
+            }
+        };
+
+        try
+        {
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            if (!process.WaitForExit(300000))
+            {
+                process.Kill();
+                var error = $"FFmpeg process timed out after 5 minutes during {operation}.\n" +
+                           $"Output:\n{outputBuilder}\n" +
+                           $"Error:\n{errorBuilder}";
+                throw new Exception(error);
+            }
+
+            if (process.ExitCode != 0)
+            {
+                var error = $"FFmpeg failed during {operation} with exit code {process.ExitCode}.\n" +
+                           $"Output:\n{outputBuilder}\n" +
+                           $"Error:\n{errorBuilder}";
+                throw new Exception(error);
+            }
         }
-
-        var startInfo = new ProcessStartInfo
+        catch (Exception ex) when (ex is not TimeoutException)
         {
-            FileName = filename,
-            Arguments = arguments,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        var process = new Process
-        {
-            StartInfo = startInfo
-        };
-
-        process.Start();
-        process.WaitForExit();
-
-        // var output = process.StandardOutput.ReadToEnd();
-        //
-        // Console.WriteLine($"{filename} {arguments}");
-        // Console.WriteLine($"Exit code: {process.ExitCode}");
-        // Console.WriteLine(output);
+            var error = $"Error running FFmpeg during {operation}: {ex.Message}\n" +
+                       $"Output:\n{outputBuilder}\n" +
+                       $"Error:\n{errorBuilder}";
+            throw new Exception(error, ex);
+        }
     }
 
-    private static void StripMetadata(FileInfo file)
+    private void UpdateMetadata(FileInfo audioFile, Track track, Album album)
     {
-        string filename;
-        string arguments;
+        var tempFile = Path.Combine(
+            Path.GetDirectoryName(audioFile.FullName)!,
+            $"temp_{Path.GetFileName(audioFile.FullName)}");
 
-        switch (file.Extension)
+        try
         {
-            case ".mp3":
-                filename = "eyeD3";
-                arguments = $"--remove-all \"{file.FullName}\"";
-                break;
-            case ".flac":
-                filename = "metaflac";
-                arguments = $"--remove-all \"{file.FullName}\"";
-                break;
-            default:
-                throw new ArgumentException($"Unsupported file type: {file.Extension}",nameof(file));
+            var metadata = new Dictionary<string, string>
+            {
+                {"title", track.Title},
+                {"artist", album.Artist.Name},
+                {"album", album.Title},
+                {"track", track.Number.ToString()},
+                {"date", album.Date.Year.ToString()},
+                {"MUSICBRAINZ_ALBUMID", album.Id.ToString()},
+                {"MUSICBRAINZ_ARTISTID", album.Artist.Id.ToString()},
+                {"MUSICBRAINZ_TRACKID", track.Id.ToString()}
+            };
+
+            var metadataArgs = string.Join(" ",
+                metadata.Select(kv => $"-metadata {kv.Key}=\"{kv.Value}\""));
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = _config.FfmpegPath,
+                Arguments = $"-i \"{audioFile.FullName}\" -c copy {metadataArgs} \"{tempFile}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            RunFfmpegProcess(startInfo, $"updating metadata for {audioFile.Name}");
+
+            File.Delete(audioFile.FullName);
+            File.Move(tempFile, audioFile.FullName);
         }
-
-        var startInfo = new ProcessStartInfo
+        catch
         {
-            FileName = filename,
-            Arguments = arguments,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+            if (File.Exists(tempFile))
+                File.Delete(tempFile);
+            throw;
+        }
+    }
 
-        var process = new Process
+    private void AddCoverImage(FileInfo audioFile, FileInfo coverFile)
+    {
+        var tempFile = Path.Combine(
+            Path.GetDirectoryName(audioFile.FullName)!,
+            $"temp_{Path.GetFileName(audioFile.FullName)}");
+
+        try
         {
-            StartInfo = startInfo
-        };
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = _config.FfmpegPath,
+                Arguments = $"-i \"{audioFile.FullName}\" -i \"{coverFile.FullName}\" -map 0 -map 1 -c copy " +
+                           $"-disposition:v:0 attached_pic \"{tempFile}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-        process.Start();
-        process.WaitForExit();
+            RunFfmpegProcess(startInfo, $"adding cover image to {audioFile.Name}");
 
-        // var output = process.StandardOutput.ReadToEnd();
-        //
-        // Console.WriteLine($"{filename} {arguments}");
-        // Console.WriteLine($"Exit code: {process.ExitCode}");
-        // Console.WriteLine(output);
+            File.Delete(audioFile.FullName);
+            File.Move(tempFile, audioFile.FullName);
+        }
+        catch
+        {
+            if (File.Exists(tempFile))
+                File.Delete(tempFile);
+            throw;
+        }
+    }
+
+    private void StripMetadata(FileInfo file)
+    {
+        var tempFile = Path.Combine(
+            Path.GetDirectoryName(file.FullName)!,
+            $"temp_{Path.GetFileName(file.FullName)}");
+
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = _config.FfmpegPath,
+                Arguments = $"-i \"{file.FullName}\" -map_metadata -1 -c copy \"{tempFile}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            RunFfmpegProcess(startInfo, $"stripping metadata from {file.Name}");
+
+            File.Delete(file.FullName);
+            File.Move(tempFile, file.FullName);
+        }
+        catch
+        {
+            if (File.Exists(tempFile))
+                File.Delete(tempFile);
+            throw;
+        }
     }
 }
