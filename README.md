@@ -1,7 +1,5 @@
 # Djinn
 
-## Overview
-
 Djinn is a command-line application for downloading music using Soulseek, with metadata from MusicBrainz, Last.fm, and Spotify.
 
 ## Downloading Music with `djinn download`
@@ -99,6 +97,7 @@ Here is an example of what the configuration file might look like:
 ```
 {
     "LibraryPath": "/home/kyle/Music",
+    "FfmpegPath": "/usr/bin/ffmpeg",
     "LastFmApiKey": "XXX",
     "LastFmApiSecret": "XXX",
     "SpotifyClientId": "XXX",
@@ -150,6 +149,7 @@ You can view the path of the loaded config file and the parsed values by running
 $ djinn config
 Configuration loaded from /home/kyle/.config/djinn/djinn.json
 Library path:       /home/kyle/Music
+Ffmpeg path:        /usr/bin/ffmpeg
 Last.fm API key:    XXX
 Last.fm API secret: XXX
 Spotify client ID:  XXX
@@ -183,25 +183,3 @@ Downloaded cover art for Yo‐Yo Ma - Japanese Melodies
 $ djinn upgrade
 ...
 ```
-
-## Building
-
-### Arch
-
-```
-yay python-eyed3
-sudo pacman -Sy flac
-```
-
-### Fedora
-
-```
-sudo dnf install python3-eyed3 flac
-```
-
-### Ubuntu 24.04
-
-```
-sudo apt install eyed3 flac
-```
-

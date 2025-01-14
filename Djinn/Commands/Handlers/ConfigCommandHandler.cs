@@ -15,6 +15,7 @@ public class ConfigCommandHandler : ICommandHandler
         
         Log.Information($"Configuration loaded from {configPath}");
         Log.Information($"Library path:       {config.LibraryPath}");
+        Log.Information($"Ffmpeg path:        {config.FfmpegPath}");
         Log.Information($"Last.fm API key:    {config.LastFmApiKey}");
         Log.Information($"Last.fm API secret: {config.LastFmApiSecret}");
         Log.Information($"Spotify client ID:  {config.SpotifyClientId}");
