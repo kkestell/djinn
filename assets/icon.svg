@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="550"
+   height="550"
+   viewBox="0 0 550 550"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="../../recipes/assets/icon.svg"
+   inkscape:export-xdpi="89.367271"
+   inkscape:export-ydpi="89.367271"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.75"
+     inkscape:cx="396.66667"
+     inkscape:cy="344.66667"
+     inkscape:window-width="1920"
+     inkscape:window-height="1129"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="550"
+       height="550"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient13"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#e30e0e;stop-opacity:1;"
+         offset="0"
+         id="stop14" />
+      <stop
+         style="stop-color:#ffdd6e;stop-opacity:1;"
+         offset="1"
+         id="stop99" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient13"
+       id="linearGradient15"
+       x1="275"
+       y1="19"
+       x2="275"
+       y2="531"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0,-12.094803)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       d="M 19,286 C 19,30 19,30 275,30 c 256,0 256,0 256,256 0,256 0,256 -256,256 C 19,542 19,542 19,286"
+       id="path1"
+       style="fill:#6a0000;fill-opacity:1"
+       inkscape:label="path1" />
+    <path
+       d="M 19,262.90522 C 19,6.9051969 19,6.9051969 275,6.9051969 c 256,0 256,0 256,256.0000231 0,256 0,256 -256,256 -256,0 -256,0 -256,-256"
+       id="path2"
+       style="display:inline;fill:url(#linearGradient15);fill-opacity:1;stroke:none;stroke-width:5;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:350px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;fill:#6d0000;fill-opacity:1;stroke:none;stroke-width:5;stroke-dasharray:none;stroke-opacity:1"
+       x="138.22501"
+       y="413.91467"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         x="138.22501"
+         y="413.91467"
+         style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:350px;font-family:'URW Bookman';-inkscape-font-specification:'URW Bookman Semi-Bold';fill:#6d0000;fill-opacity:1;stroke:none;stroke-width:5;stroke-dasharray:none;stroke-opacity:1">D</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:350px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5;stroke-dasharray:none;stroke-opacity:1"
+       x="138.22501"
+       y="390.10181"
+       id="text99"><tspan
+         sodipodi:role="line"
+         id="tspan99"
+         x="138.22501"
+         y="390.10181"
+         style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:350px;font-family:'URW Bookman';-inkscape-font-specification:'URW Bookman Semi-Bold';fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5;stroke-dasharray:none;stroke-opacity:1">D</tspan></text>
+  </g>
+</svg>
