@@ -1,7 +1,7 @@
 #define SourceDir "C:\Users\Kyle\Source\djinn"
 
 [Setup]
-AppId={{15B0BFB2-7A36-43D3-90C7-B714DCDC1F19}
+AppId={{a56a6c7c-aa20-48de-ba61-04db6bc62d44}}
 AppName=Djinn
 AppVersion=0.1.0
 AppVerName=Djinn
@@ -33,4 +33,4 @@ Name: "powershellshortcut"; Description: "Create desktop shortcut to PowerShell 
 Source: "{#SourceDir}\publish\Djinn.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{userdesktop}\Djinn PowerShell"; Filename: "powershell.exe"; Parameters: "-NoExit -Command ""cd $HOME; $env:PATH = '{app}' + ';' + $env:PATH"""; Tasks: powershellshortcut
+Name: "{userdesktop}\Djinn PowerShell"; Filename: "powershell.exe"; Parameters: "-NoExit -Command ""cd $HOME; $env:PATH = '{app}' + ';' + $env:PATH; Write-Host 'Hint: djinn --help'"""; Tasks: powershellshortcut
