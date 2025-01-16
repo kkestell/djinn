@@ -1,10 +1,10 @@
 # Djinn
 
+Music library manager and Soulseek client using metadata from MusicBrainz, Last.fm, and Spotify.
+
 <p align="center">
     <img alt="The Djinn" src="assets/icon.png">
 </p>
-
-Djinn is a command-line application for downloading music using Soulseek, with metadata from MusicBrainz, Last.fm, and Spotify.
 
 ## Downloading Music with `djinn download`
 
