@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>13</LangVersion>
+        <AssemblyName>music</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FuzzySharp" Version="2.0.2" />
+        <PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />
+        <PackageReference Include="MetaBrainz.MusicBrainz" Version="6.1.0" />
+        <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="6.0.0" />
+        <PackageReference Include="SixLabors.Fonts" Version="2.1.3" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+        <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
+        <PackageReference Include="SixPix" Version="0.3.0" />
+        <PackageReference Include="Soulseek" Version="7.0.3" />
+        <PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+        <PackageReference Include="TagLibSharp" Version="2.3.0" />
+        <PackageReference Include="Wcwidth" Version="2.0.0" />
+    </ItemGroup>
+</Project>

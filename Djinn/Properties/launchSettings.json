@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Djinn": {
-      "commandName": "Project",
-      "commandLineArgs": "download --artist-name=\"The Cure\""
-    }
-  }
-}
