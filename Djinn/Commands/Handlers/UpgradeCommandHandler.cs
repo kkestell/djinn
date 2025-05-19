@@ -11,7 +11,7 @@ public class UpgradeCommandHandler : ICommandHandler
 {
     public async Task<int> InvokeAsync(InvocationContext context)
     {
-        var config = MusicConfig.Load();
+        var config = DjinnConfig.Load();
         var verbose = context.ParseResult.GetValueForOption(UpgradeCommand.Verbose);
         var randomize = context.ParseResult.GetValueForOption(UpgradeCommand.Randomize);
         if (verbose)

@@ -12,13 +12,13 @@ public class SourceDownloader
     private const string SpinnerFrames = "⠁⠂⠄⡀⡈⡐⡠⣀⣁⣂⣄⣌⣔⣤⣥⣦⣮⣶⣷⣿⡿⠿⢟⠟⡛⠛⠫⢋⠋⠍⡉⠉⠑⠡⢁";
     private static int _spinnerFrameIndex;
     private static DateTime _lastProgressUpdate = DateTime.MinValue;
-    private readonly MusicConfig _config;
+    private readonly DjinnConfig _config;
     private readonly TransferOptions _transferOptions;
     private CancellationTokenSource _transferStoppingTokenSource = new();
     private Stopwatch _transferStopWatch = new();
     private CancellationTokenSource _globalCancellationSource = new();
 
-    public SourceDownloader(MusicConfig config)
+    public SourceDownloader(DjinnConfig config)
     {
         _config = config;
 

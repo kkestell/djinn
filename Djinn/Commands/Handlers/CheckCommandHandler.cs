@@ -11,7 +11,7 @@ namespace Djinn.Commands.Handlers;
 
 public class CheckCommandHandler : ICommandHandler
 {
-    private readonly MusicConfig _config = MusicConfig.Load();
+    private readonly DjinnConfig _config = DjinnConfig.Load();
     private bool _fix;
 
     public async Task<int> InvokeAsync(InvocationContext context)

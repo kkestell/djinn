@@ -14,9 +14,9 @@ public class CoverArtDownloader
     private const int VersionMinor = 0;
     private const int VersionPatch = 0;
 
-    private readonly MusicConfig _config;
+    private readonly DjinnConfig _config;
 
-    public CoverArtDownloader(MusicConfig config)
+    public CoverArtDownloader(DjinnConfig config)
     {
         _config = config;
     }

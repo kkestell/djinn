@@ -1,9 +1,9 @@
 #!/bin/bash
 
-dotnet publish Music/Music.csproj -c Release -r linux-x64 -o publish /p:PublishSingleFile=true /p:SelfContained=true /p:AssemblyName=music
+dotnet publish Djinn/Djinn.csproj -c Release -o publish /p:PublishSingleFile=true /p:SelfContained=true /p:AssemblyName=djinn
 
 mkdir -p ~/.local/bin
 
-cp publish/music ~/.local/bin/
+cp publish/djinn ~/.local/bin/
 
-chmod +x ~/.local/bin/music
+chmod +x ~/.local/bin/djinn

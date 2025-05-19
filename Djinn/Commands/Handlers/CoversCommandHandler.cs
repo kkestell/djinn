@@ -11,7 +11,7 @@ public class CoversCommandHandler : ICommandHandler
 {
     public async Task<int> InvokeAsync(InvocationContext context)
     {
-        var config = MusicConfig.Load();
+        var config = DjinnConfig.Load();
         
         var verbose = context.ParseResult.GetValueForOption(CoverCommand.Verbose);
         var force = context.ParseResult.GetValueForOption(CoverCommand.Force);

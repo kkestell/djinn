@@ -7,9 +7,9 @@ namespace Djinn.Services;
 
 public class MetadataService
 {
-    private readonly MusicConfig _config;
+    private readonly DjinnConfig _config;
 
-    public MetadataService(MusicConfig config)
+    public MetadataService(DjinnConfig config)
     {
         _config = config;
     }

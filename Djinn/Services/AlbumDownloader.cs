@@ -10,12 +10,12 @@ namespace Djinn.Services;
 
 public class AlbumDownloader
 {
-    private readonly MusicConfig _config;
+    private readonly DjinnConfig _config;
     private readonly CoverArtDownloader _coverArtDownloader;
     private readonly MetadataService _metadataService;
     private readonly SourceDownloader _sourceDownloader;
 
-    public AlbumDownloader(MusicConfig config, CoverArtDownloader coverArtDownloader, MetadataService metadataService, SourceDownloader sourceDownloader)
+    public AlbumDownloader(DjinnConfig config, CoverArtDownloader coverArtDownloader, MetadataService metadataService, SourceDownloader sourceDownloader)
     {
         _config = config;
         _coverArtDownloader = coverArtDownloader;

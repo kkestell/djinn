@@ -16,7 +16,7 @@ internal abstract class Program
 
         try
         {
-            MusicConfig.Validate();
+            DjinnConfig.Validate();
         }
         catch (ConfigurationError e)
         {

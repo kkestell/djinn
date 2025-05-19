@@ -12,7 +12,7 @@ public class StatsCommandHandler : ICommandHandler
 
     public int Invoke(InvocationContext context)
     {
-        var config = MusicConfig.Load();
+        var config = DjinnConfig.Load();
         
         var libraryDirectory = new DirectoryInfo(config.LibraryPath);
         var artistDirectories = libraryDirectory.EnumerateDirectories().ToList();

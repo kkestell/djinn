@@ -10,7 +10,7 @@ public class DownloadCommandHandler : ICommandHandler
 {
     private readonly MusicBrainzService _musicBrainzService = new();
     private readonly RetryableQueue<Album> _downloadQueue = new();
-    private readonly MusicConfig _config = MusicConfig.Load();
+    private readonly DjinnConfig _config = DjinnConfig.Load();
 
     public async Task<int> InvokeAsync(InvocationContext context)
     {

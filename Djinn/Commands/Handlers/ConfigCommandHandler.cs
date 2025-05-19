@@ -10,8 +10,8 @@ public class ConfigCommandHandler : ICommandHandler
 {
     public Task<int> InvokeAsync(InvocationContext context)
     {
-        var configPath = MusicConfig.ConfigPath;
-        var config = MusicConfig.Load();
+        var configPath = DjinnConfig.ConfigPath;
+        var config = DjinnConfig.Load();
         
         Log.Information($"Configuration loaded from {configPath}");
         Log.Information($"Library path:       {config.LibraryPath}");

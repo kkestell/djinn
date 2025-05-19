@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>13</LangVersion>
-        <AssemblyName>music</AssemblyName>
+        <AssemblyName>djinn</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

@@ -11,7 +11,7 @@ public class ConfigurationError : Exception
     public ConfigurationError(string message, Exception innerException) : base(message, innerException) { }
 }
 
-public class MusicWatchdogConfig
+public class DjinnWatchdogConfig
 {
     public int? TimeoutMinutes { get; set; }
     public int? DelaySeconds { get; set; }
@@ -19,7 +19,7 @@ public class MusicWatchdogConfig
     public bool QueuedRemotely { get; set; }
 }
 
-public class MusicConfig
+public class DjinnConfig
 {
     public string LibraryPath { get; set; }
     public string FfmpegPath { get; set; }
@@ -33,13 +33,13 @@ public class MusicConfig
     public string ArtistFormat { get; set; }
     public string AlbumFormat { get; set; }
     public string TrackFormat { get; set; }
-    public MusicWatchdogConfig? Watchdog { get; set; }
+    public DjinnWatchdogConfig? Watchdog { get; set; }
 
     public bool Verbose { get; set; }
     public bool NoProgress { get; set; }
     public bool StripExistingMetadata { get; set; }
 
-    public MusicConfig()
+    public DjinnConfig()
     {
         // Initialize with default values
         ArtistFormat = "%S";
@@ -134,13 +134,13 @@ public class MusicConfig
         return value;
     }
 
-    public static MusicConfig CreateInteractive()
+    public static DjinnConfig CreateInteractive()
     {
         Console.WriteLine("Welcome to Djinn Configuration Setup!");
         Console.WriteLine("Press Enter to accept the default value (shown in brackets) or type your own.");
         Console.WriteLine();
 
-        var config = new MusicConfig
+        var config = new DjinnConfig
         {
             LibraryPath = PromptForValue("Library Path", GetDefaultLibraryPath(), true),
             FfmpegPath = PromptForValue("FFmpeg Path", GetDefaultFfmpegPath(), true),
@@ -205,7 +205,7 @@ public class MusicConfig
             throw new ConfigurationError("Track format is required");
     }
 
-    public static MusicConfig Load()
+    public static DjinnConfig Load()
     {
         if (!File.Exists(ConfigPath))
         {
@@ -216,7 +216,7 @@ public class MusicConfig
         try
         {
             var jsonContent = File.ReadAllText(ConfigPath);
-            var config = JsonSerializer.Deserialize<MusicConfig>(jsonContent)
+            var config = JsonSerializer.Deserialize<DjinnConfig>(jsonContent)
                 ?? throw new ConfigurationError($"Failed to deserialize config file at path: {ConfigPath}");
 
             return config;
@@ -239,10 +239,10 @@ public class MusicConfig
             }
             else
             {
-                defaultConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "music", "config.json");
+                defaultConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "djinn", "config.json");
             }
 
-            var configPath = Environment.GetEnvironmentVariable("MUSIC_CONFIG") ?? defaultConfigPath;
+            var configPath = Environment.GetEnvironmentVariable("DJINN_CONFIG") ?? defaultConfigPath;
             return configPath;
         }
     }

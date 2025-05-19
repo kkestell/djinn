@@ -11,7 +11,7 @@ public class SuggestCommandHandler : ICommandHandler
     {
         var limit = 30;
         
-        var config = MusicConfig.Load();
+        var config = DjinnConfig.Load();
 
         var artistName = context.ParseResult.GetValueForOption(SuggestCommand.ArtistName);
 
