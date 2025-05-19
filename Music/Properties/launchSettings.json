@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Music": {
-      "commandName": "Project",
-      "commandLineArgs": "check"
-    }
-  }
-}
