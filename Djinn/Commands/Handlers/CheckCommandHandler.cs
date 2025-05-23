@@ -283,8 +283,8 @@ public class CheckCommandHandler : ICommandHandler
                 };
 
                 // If the directory names are already correct, skip
-                if (artistDirectory.Name == expectedArtistDirectoryName &&
-                    albumDirectory.Name == expectedAlbumDirectoryName)
+                if (PathUtils.NormalizePath(artistDirectory.Name) == PathUtils.NormalizePath(expectedArtistDirectoryName) &&
+                    PathUtils.NormalizePath(albumDirectory.Name) == PathUtils.NormalizePath(expectedAlbumDirectoryName))
                 {
                     infoDictionary.Add("Status", "OK");
                     Log.Verbose(FormatDictionary(infoDictionary));
@@ -298,14 +298,13 @@ public class CheckCommandHandler : ICommandHandler
                 Log.Warning(FormatDictionary(infoDictionary));
 
                 // Avoid gnarly case-sensitivity issues on Windows
-                if (string.Equals(actualPath, expectedPath, StringComparison.OrdinalIgnoreCase) &&
-                    !string.Equals(actualPath, expectedPath, StringComparison.Ordinal))
+                if (string.Equals(PathUtils.NormalizePath(actualPath), PathUtils.NormalizePath(expectedPath), StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(PathUtils.NormalizePath(actualPath), PathUtils.NormalizePath(expectedPath), StringComparison.Ordinal))
                 {
                     Log.Error("Directory names differ only by case. This is not supported on Windows. Please rename the directories manually.");
                     continue;
                 }
                 
-                // FIXME: Guard by --fix
                 if (_fix)
                 {
                     var expectedDirectory = new DirectoryInfo(expectedPath);
@@ -344,191 +343,3 @@ public class CheckCommandHandler : ICommandHandler
         }
     }
 }
-
-// public class CheckCommandHandler : ICommandHandler
-// {
-//     public async Task<int> InvokeAsync(InvocationContext context)
-//     {
-//         var config = DjinnConfig.Load();
-//         
-//         var libraryDirectory = new DirectoryInfo(config.LibraryPath);
-//         var artistDirectories = libraryDirectory.EnumerateDirectories().OrderBy(x => x.Name).ToList();
-//         
-//         var musicBrainzService = new MusicBrainzService();
-//         var metadataService = new MetadataService(config);
-//
-//         foreach (var artistDirectory in artistDirectories)
-//         {
-//             var albumDirectories = artistDirectory.EnumerateDirectories().OrderBy(x => x.Name).ToList();
-//             foreach (var albumDirectory in albumDirectories)
-//             {
-//                 var trackFiles = albumDirectory.EnumerateFiles()
-//                     .ToList();
-//
-//                 var metadataFile = trackFiles.FirstOrDefault(file => file.Name.Equals(
-//                         ".metadata.json",
-//                         StringComparison.OrdinalIgnoreCase
-//                     )
-//                 );
-//                 
-//                 // var numAudioFiles = trackFiles.Count(file => file.Extension.Equals(".flac", StringComparison.OrdinalIgnoreCase) || 
-//                 //                                                 file.Extension.Equals(".mp3", StringComparison.OrdinalIgnoreCase));
-//                 if (metadataFile is null)
-//                 {
-//                     Console.WriteLine($"Error: No metadata file found for {artistDirectory.Name}/{albumDirectory.Name}");
-//                     continue;
-//
-//                     // var album = await musicBrainzService.FindAlbum(albumDirectory.Name, artistDirectory.Name, numAudioFiles);
-//                     //
-//                     // if (album is null)
-//                     // {
-//                     //     Console.WriteLine($"Warning: No metadata file found and unable to find album {albumDirectory.Name}");
-//                     //     continue;
-//                     // }
-//                     //
-//                     // // var album = await musicBrainzService.FindAlbum(releaseId);
-//                     // var newMetadataJson = JsonSerializer.Serialize(album, new JsonSerializerOptions
-//                     // {
-//                     //     WriteIndented = true,
-//                     //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-//                     // });
-//                     // metadataFile = new FileInfo(Path.Combine(albumDirectory.FullName, ".metadata.json"));
-//                     // await File.WriteAllTextAsync(metadataFile.FullName, newMetadataJson);
-//                     // Console.WriteLine($"Updated album metadata in {metadataFile.FullName}");
-//                 }
-//                 else
-//                 {
-//                     var metadataAlbum = JsonSerializer.Deserialize<Album>(
-//                         await File.ReadAllTextAsync(metadataFile.FullName),
-//                         new JsonSerializerOptions
-//                         {
-//                             PropertyNameCaseInsensitive = true
-//                         }
-//                     );
-//                     
-//                     if (metadataAlbum is null)
-//                     {
-//                         Console.WriteLine($"Warning: Unable to parse metadata file {metadataFile.FullName}");
-//                         continue;
-//                     }
-//
-//                     var expectedArtistDirectoryName = NameService.FormatArtist(metadataAlbum, config.ArtistFormat);
-//                     var expectedAlbumDirectoryName = NameService.FormatAlbum(metadataAlbum, config.AlbumFormat);
-//                     
-//                     if (!artistDirectory.Name.Equals(expectedArtistDirectoryName, StringComparison.OrdinalIgnoreCase))
-//                     {
-//                         Console.WriteLine($"Warning: Artist directory name mismatch. Expected {expectedArtistDirectoryName}, found {artistDirectory.Name}");
-//                     }
-//                     
-//                     if (!albumDirectory.Name.Equals(expectedAlbumDirectoryName, StringComparison.OrdinalIgnoreCase))
-//                     {
-//                         Console.WriteLine($"Warning: Album directory name mismatch. Expected {expectedAlbumDirectoryName}, found {albumDirectory.Name}");
-//                     }
-//                 }
-//
-//                 //
-//                 // Guid? releaseId = null;
-//                 //
-//                 // if (metadataFile is null)
-//                 // {
-//                 //     Console.WriteLine($"No metadata file found for {artistDirectory.Name}/{albumDirectory.Name}");
-//                 //     continue;
-//                 //     
-//                 //     var release = await musicBrainzService.FindAlbum(albumDirectory.Name);
-//                 //     
-//                 //     if (release is null)
-//                 //     {
-//                 //         Console.WriteLine($"Warning: No metadata file found and unable to find album {albumDirectory.Name}");
-//                 //         continue;
-//                 //     }
-//                 //     
-//                 //     // If we found by name, get the ID from the release
-//                 //     releaseId = release.Id;
-//                 // }
-//                 // else
-//                 // {
-//                 //     var metadataJson = await File.ReadAllTextAsync(metadataFile.FullName);
-//                 //     var parsedMetadata = JsonDocument.Parse(metadataJson);
-//                 //
-//                 //     // Extract the release ID regardless of metadata format
-//                 //     Guid extractedId;
-//                 //     if (!TryGetReleaseId(parsedMetadata.RootElement, out extractedId))
-//                 //     {
-//                 //         Console.WriteLine($"Warning: Could not extract release ID from {metadataFile.FullName}");
-//                 //         continue;
-//                 //     }
-//                 //     
-//                 //     releaseId = extractedId;
-//                 // }
-//                 //
-//                 // // Ensure we have a release ID at this point
-//                 // if (!releaseId.HasValue)
-//                 // {
-//                 //     Console.WriteLine($"Warning: No release ID found for {albumDirectory.Name}");
-//                 //     continue;
-//                 // }
-//                 //
-//                 // // Look up the album on MusicBrainz using the ID
-//                 //
-//                 // Console.WriteLine($"Looking up {artistDirectory.Name}/{albumDirectory.Name} on MusicBrainz");
-//                 //
-//                 // var album = await musicBrainzService.FindAlbum(releaseId.Value);
-//                 //
-//                 // if (album is null)
-//                 // {
-//                 //     Console.WriteLine($"Warning: Album not found in MusicBrainz for id {releaseId}");
-//                 //     continue;
-//                 // }
-//                 //
-//                 // // Create path for metadata file if it doesn't exist
-//                 // if (metadataFile is null)
-//                 // {
-//                 //     metadataFile = new FileInfo(Path.Combine(albumDirectory.FullName, ".metadata.json"));
-//                 // }
-//                 //
-//                 // // Recreate the metadata file with fresh data
-//                 // var newMetadataJson = JsonSerializer.Serialize(album, new JsonSerializerOptions
-//                 // {
-//                 //     WriteIndented = true,
-//                 //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-//                 // });
-//                 //
-//                 // await File.WriteAllTextAsync(metadataFile.FullName, newMetadataJson);
-//                 //
-//                 // Console.WriteLine($"Updated album metadata in {metadataFile.FullName}");
-//             }
-//         }
-//         
-//         return 0;
-//     }
-//     
-//     private bool TryGetReleaseId(JsonElement root, out Guid releaseId)
-//     {
-//         releaseId = Guid.Empty;
-//         
-//         // Try to extract ID directly from root with lowercase "id" (new-style)
-//         if (root.TryGetProperty("id", out var idProperty) && 
-//             idProperty.ValueKind == JsonValueKind.String &&
-//             !string.IsNullOrWhiteSpace(idProperty.GetString()) &&
-//             Guid.TryParse(idProperty.GetString(), out releaseId))
-//         {
-//             return true;
-//         }
-//         
-//         // Try to extract ID directly from root with uppercase "Id" (case in provided example)
-//         if (root.TryGetProperty("Id", out idProperty) && 
-//             idProperty.ValueKind == JsonValueKind.String &&
-//             !string.IsNullOrWhiteSpace(idProperty.GetString()) &&
-//             Guid.TryParse(idProperty.GetString(), out releaseId))
-//         {
-//             return true;
-//         }
-//         
-//         return false;
-//     }
-//
-//     public int Invoke(InvocationContext context)
-//     {
-//         return InvokeAsync(context).GetAwaiter().GetResult();
-//     }
-// }

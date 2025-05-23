@@ -31,12 +31,12 @@ public class CoverArtDownloader
 
         if (coverImage is not null)
         {
-            //if (ImageToSixel.IsSixelSupported())
+            if (_config.CoverDisplayStyle == CoverDisplayStyle.Sixel)
             {
                 var imageSixel = ImageToSixel.Encode(coverImage, 500);
                 Console.Out.WriteLine(imageSixel);
             }
-            //else
+            else if (_config.CoverDisplayStyle == CoverDisplayStyle.Ansi)
             {
                 
                 var imageAnsi = ImageToAnsiConverter.ImageToAnsi(coverImage, Console.WindowHeight - 4);

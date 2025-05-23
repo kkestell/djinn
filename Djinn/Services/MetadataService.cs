@@ -150,7 +150,7 @@ public class MetadataService
                 errorBuilder.AppendLine(args.Data);
                 if (_config.Verbose)
                 {
-                    Log.Verbose($"FFmpeg Error: {args.Data}");
+                    Log.Verbose($"FFmpeg: {args.Data}");
                 }
             }
         };

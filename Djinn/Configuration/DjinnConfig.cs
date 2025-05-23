@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Djinn.Services;
 
 namespace Djinn.Configuration;
@@ -9,6 +10,13 @@ public class ConfigurationError : Exception
     public ConfigurationError(string message) : base(message) { }
 
     public ConfigurationError(string message, Exception innerException) : base(message, innerException) { }
+}
+
+public enum CoverDisplayStyle
+{
+    None,
+    Ansi,
+    Sixel
 }
 
 public class DjinnWatchdogConfig
@@ -34,10 +42,11 @@ public class DjinnConfig
     public string AlbumFormat { get; set; }
     public string TrackFormat { get; set; }
     public DjinnWatchdogConfig? Watchdog { get; set; }
+    public CoverDisplayStyle CoverDisplayStyle { get; set; } = CoverDisplayStyle.None;
+    public bool StripExistingMetadata { get; set; }
 
     public bool Verbose { get; set; }
     public bool NoProgress { get; set; }
-    public bool StripExistingMetadata { get; set; }
 
     public DjinnConfig()
     {
@@ -215,9 +224,14 @@ public class DjinnConfig
 
         try
         {
+            var jsonOptions = new JsonSerializerOptions
+            {
+                Converters = { new JsonStringEnumConverter() }
+            };
+        
             var jsonContent = File.ReadAllText(ConfigPath);
-            var config = JsonSerializer.Deserialize<DjinnConfig>(jsonContent)
-                ?? throw new ConfigurationError($"Failed to deserialize config file at path: {ConfigPath}");
+            var config = JsonSerializer.Deserialize<DjinnConfig>(jsonContent, jsonOptions)
+                         ?? throw new ConfigurationError($"Failed to deserialize config file at path: {ConfigPath}");
 
             return config;
         }
